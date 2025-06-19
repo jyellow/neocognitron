@@ -1,3 +1,6 @@
 A neural network made for OCR of handwritten uppercase English letters based on Fukushima's 1988 Neocognitron. 
 
 Adapted from a Java implementation by GitHub user nicholasjconn. See his original work here: https://github.com/nicholasjconn/Neocognitron-Java
+---
+
+This Repo is fork from Sergey Korotaev's work, his original code is here: https://github.com/lcpo/neocognitron

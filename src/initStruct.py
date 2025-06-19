@@ -1,4 +1,4 @@
-import cPickle as pickle
+import pickle
 import random
 import math
 import numpy as np
@@ -58,14 +58,14 @@ class InitStruct(object):
 	def generateC(self):	
 		self.C = []
 		self.C.append(self.generateMonotonic(self.gamma[0], self.S_WINDOW_SIZE[0], 1, True))
-		for i in xrange(1, self.NUM_LAYERS):
+		for i in range(1, self.NUM_LAYERS):
 			self.C.append(self.generateMonotonic(self.gamma[i], self.S_WINDOW_SIZE[i], self.PLANES_PER_LAYER[i-1], True))
 
 	def generateD(self):	
 		self.D = []
-		for i in xrange(self.NUM_LAYERS):
+		for i in range(self.NUM_LAYERS):
 			self.D.append(self.generateMonotonic(self.delta[i], self.C_WINDOW_SIZE[i], self.PLANES_PER_LAYER[i], False))
-			for w in xrange(self.D[i].shape[0]):
+			for w in range(self.D[i].shape[0]):
 				self.D[i][w] = self.D[i][w]*self.delta_bar[i]
 
 	def distance(self, a, b):
@@ -80,16 +80,16 @@ class InitStruct(object):
 		center = (float(size) - 1)/2
 		center = (center, center)
 		index = 0
-		for x in xrange(size):
-			for y in xrange(size):
+		for x in range(size):
+			for y in range(size):
 				output[index] = pow(base, self.distance(center, (x, y)))
 				index += 1
 		if norm:
 			total = 0
-			for w in xrange(output.shape[0]):
+			for w in range(output.shape[0]):
 				total += output[w]
 			mult = float(1)/(planes * total)
-			for w in xrange(output.shape[0]):
+			for w in range(output.shape[0]):
 				output[w] = output[w]*mult
 		return output
 
@@ -134,7 +134,7 @@ class InitStruct(object):
 
 		# Q 
 		self.Q[0] = random.uniform(.05, .75)
-		for i in xrange(1, 4):
+		for i in range(1, 4):
 			self.Q[i] = random.choice(self.Q_RANGE[i-1])
 
 		# R 

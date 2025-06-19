@@ -17,8 +17,8 @@ class SLayer(object):
 		self.r = initStruct.R[layer]
 		self.c = initStruct.C[layer]
 
-		self.sCells = np.zeros((self.numPlanes, self.size, self.size), dtype=np.object)
-		self.vCells = np.zeros((self.size, self.size), dtype=np.object)
+		self.sCells = np.zeros((self.numPlanes, self.size, self.size), dtype=object)
+		self.vCells = np.zeros((self.size, self.size), dtype=object)
 
 		prev = 0
 		if layer == 0: 
@@ -31,32 +31,32 @@ class SLayer(object):
 		self.createCells()
 
 	def createCells(self):
-		for x in xrange(self.size):
-			for y in xrange(self.size):				
+		for x in range(self.size):
+			for y in range(self.size):				
 				self.vCells[x][y] = vsCell.VSCell(self.c)
-				for plane in xrange(self.numPlanes):
+				for plane in range(self.numPlanes):
 					self.sCells[plane][x][y] = sCell.SCell(self.r)
 
 	def initA(self, prev):
 		self.a = np.zeros((self.numPlanes, prev, pow(self.windowSize, 2)))
-		for k in xrange(self.numPlanes):
-			for ck in xrange(prev):
-				for w in xrange(pow(self.windowSize, 2)):
+		for k in range(self.numPlanes):
+			for ck in range(prev):
+				for w in range(pow(self.windowSize, 2)):
 					self.a[k][ck][w] = random.random()*.4
 
 	def initB(self):
 		self.b = np.zeros((self.numPlanes))
-		for k in xrange(self.numPlanes):
+		for k in range(self.numPlanes):
 			self.b[k] = 0.
 
 	def propagate(self, inputs, train):
 		output = message.Message(self.numPlanes, self.size)
 		vOutput = np.zeros((self.size, self.size))
-		for x in xrange(self.size):
-			for y in xrange(self.size):
+		for x in range(self.size):
+			for y in range(self.size):
 				windows = inputs.getWindows(x, y, self.windowSize)
 				vOutput[x][y] = self.vCells[x][y].propagate(windows)
-				for plane in xrange(self.numPlanes):
+				for plane in range(self.numPlanes):
 					val = self.sCells[plane][x][y].propagate(windows, vOutput[x][y], self.b[plane], self.a[plane])
 					output.setOneOutput(plane, x, y, val)
 		if train:
@@ -69,7 +69,7 @@ class SLayer(object):
 		windows = inputs.getWindows(x, y, self.windowSize)
 		vOutput = self.vCells[x][y].propagate(windows)
 		output = np.zeros((self.numPlanes))
-		for plane in xrange(self.numPlanes):		
+		for plane in range(self.numPlanes):
 			sOutput = self.sCells[plane][x][y].propagate(windows, vOutput, self.b[plane], self.a[plane])
 			output[plane] = sOutput
 		return output, vOutput
@@ -77,22 +77,22 @@ class SLayer(object):
 	def adjustWeights(self, inputs, output, vOutput):
 		weightLength = pow(self.windowSize, 2)
 		representatives = output.getRepresentatives(self.columnSize)
-		for plane in xrange(self.numPlanes):
+		for plane in range(self.numPlanes):
 			if representatives[plane] != None:
 				x, y = representatives[plane]
 				delta = self.q/2 * vOutput[x][y]
 				self.b[plane] += delta
-				for ck in xrange(self.a[plane].shape[0]):
+				for ck in range(self.a[plane].shape[0]):
 						prev = inputs.getOneWindow(ck, x, y, self.windowSize)
-						for weight in xrange(weightLength):
+						for weight in range(weightLength):
 							delta = self.q * self.c[weight] * prev[weight]
 							self.a[plane][ck][weight] += delta
 
 	def train(self, trainTemplates):
-		for example in xrange(trainer.MAX_PER_PLANE):
+		for example in range(trainer.MAX_PER_PLANE):
 			inputs = message.Message(self.numPlanes, self.windowSize)
 			OK = True
-			for plane in xrange(len(trainTemplates)):
+			for plane in range(len(trainTemplates)):
 				try: 
 					inputs.setPlaneOutput(plane, trainTemplates[plane][example])
 				except Exception:

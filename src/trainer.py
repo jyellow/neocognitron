@@ -22,11 +22,11 @@ OFF = 255.
 
 def train(init):
 	network = neocognitron.Neocognitron(init)
-	for layer in xrange(init.NUM_LAYERS):
+	for layer in range(init.NUM_LAYERS):
 		trainTemplates = []
-		for plane in xrange(init.PLANES_PER_LAYER[layer]):
+		for plane in range(init.PLANES_PER_LAYER[layer]):
 			trainTemplates.append(getTrainFile(init, layer, plane))
-		print "TRAINING LAYER " + str(layer + 1)
+		print("TRAINING LAYER " + str(layer + 1))
 		network.trainLayer(layer, trainTemplates)
 	return network
 
@@ -41,8 +41,8 @@ def getTrainFile(init, layer, plane):
 		for content in contents:
 			if not content[0] == '.':
 				img = cv.imread(path + content, flags=cv.CV_LOAD_IMAGE_GRAYSCALE)
-				for x in xrange(img.shape[0]):
-					for y in xrange(img.shape[1]):
+				for x in range(img.shape[0]):
+					for y in range(img.shape[1]):
 						if img[x][y] == OFF: img[x][y] = ON
 						elif img[x][y] == ON: img[x][y] = 1.
 				output.append(img)
@@ -53,30 +53,30 @@ def crossVal(init, loops):
 	numCorrect = 0
 	numTotal = 0	
 	filesPerFold = FILES_PER_CLASS/K_FOLD
-	for k in xrange(K_FOLD):
-		print 'FOLD NUM ' + str(k+1)
+	for k in range(K_FOLD):
+		print('FOLD NUM ' + str(k+1))
 		network = neocognitron.Neocognitron(init)
 		trainFiles = range(filesPerFold*k, filesPerFold*(k+1)) 
 		trainInputs = getInputs(trainFiles)
-		print 'TRAINING'
-		for n in xrange(loops * len(trainInputs)):			
+		print('TRAINING')
+		for n in range(loops * len(trainInputs)):			
 			network.propagate(trainInputs[n % len(trainInputs)][0], True)
-			if ((n+1)%10 == 0): print '\tTRAINED ' + str(n+1) + ' of ' + str(loops * len(trainInputs))
-		print 'DONE TRAINING'
+			if ((n+1)%10 == 0): print('\tTRAINED ' + str(n+1) + ' of ' + str(loops * len(trainInputs)))
+		print('DONE TRAINING')
 		validateFiles = list(set(range(1, FILES_PER_CLASS)).symmetric_difference(trainFiles))
 		validateInputs = getInputs(validateFiles)
-		print 'VALIDATING'
-		for n in xrange(len(validateInputs)):
+		print('VALIDATING')
+		for n in range(len(validateInputs)):
 			guess = network.propagate(validateInputs[n][0], False)
 			guess = ALPHABET[guess]
-			print '\t=> ' + str(guess)
-			print '\t<= ' + str(validateInputs[n][1])
+			print('\t=> ' + str(guess))
+			print('\t<= ' + str(validateInputs[n][1]))
 			if guess == validateInputs[n][1]: numCorrect += 1
 			numTotal += 1
-		print 'DONE VALIDATING K=' + str(k+1)
-		print 'NUM CORRECT: ' + str(numCorrect)
-		print 'OF ' + str(numTotal)
-		print 'CURRENT PERCENTAGE: ' + str(float(numCorrect)/numTotal)
+		print('DONE VALIDATING K=' + str(k+1))
+		print('NUM CORRECT: ' + str(numCorrect))
+		print('OF ' + str(numTotal))
+		print('CURRENT PERCENTAGE: ' + str(float(numCorrect)/numTotal))
 	return 1.0 - float(numCorrect)/numTotal
 
 def getInputs(trainFiles):
@@ -91,10 +91,10 @@ def getInputs(trainFiles):
 				numZeros = 2
 			fileName = letter + '-' + '0'*numZeros + str(fileNum) + '.png'						
 			img = cv.imread(DATA_DIR + letter+ '/' + fileName, flags=cv.CV_LOAD_IMAGE_GRAYSCALE)
-			for x in xrange(img.shape[0]):
-					for y in xrange(img.shape[1]):
-						if img[x][y] == OFF: img[x][y] = ON
-						elif img[x][y] == ON: img[x][y] = 1.
+			for x in range(img.shape[0]):
+				for y in range(img.shape[1]):
+					if img[x][y] == OFF: img[x][y] = ON
+					elif img[x][y] == ON: img[x][y] = 1.
 			inputs.append((img, letter))
 	random.shuffle(inputs)
 	return inputs
@@ -102,32 +102,32 @@ def getInputs(trainFiles):
 def runParameterSearch():
 	minError = 1.0
 	init = initStruct.InitStruct()
-	for i in xrange(1, 501):		
-		print 'PARAM SEARCH NUM: ' + str(i)			
+	for i in range(1, 501):
+		print('PARAM SEARCH NUM: ' + str(i))
 		init.randomize()
 		error = crossVal(init, NUM_LOOPS)
-		print 'ERROR FOR NUM ' + str(i) + ' : ' + str(error)
-		if error < minError:				
+		print('ERROR FOR NUM ' + str(i) + ' : ' + str(error))
+		if error < minError:
 			minError = error
-			print '--------NEW BEST ' + str(minError) + '----------'
+			print('--------NEW BEST ' + str(minError) + '----------')
 			init.pickle(PATH_TO_SAVED + error + '.init')
 
 def validate(network):
 	numCorrect = 0
 	numTotal = 0
 	validateInputs = getInputs(range(FILES_PER_CLASS))
-	print 'TESTING'
-	for n in xrange(len(validateInputs)):
-			print 'TESTING LETTER ' + validateInputs[n][1]
+	print('TESTING')
+	for n in range(len(validateInputs)):
+			print('TESTING LETTER ' + validateInputs[n][1])
 			guess = network.propagate(validateInputs[n][0], False)
-			guess = ALPHABET[guess]			
-			print '\t<= ' + str(validateInputs[n][1])
-			print '\t=> ' + str(guess)
+			guess = ALPHABET[guess]
+			print('\t<= ' + str(validateInputs[n][1]))
+			print('\t=> ' + str(guess))
 			if guess == validateInputs[n][1]: numCorrect += 1
 			numTotal += 1
-			print 'NUM CORRECT: ' + str(numCorrect)
-			print 'OF ' + str(numTotal)
-			print 'CURRENT PERCENTAGE: ' + str(float(numCorrect)/numTotal)
+			print('NUM CORRECT: ' + str(numCorrect))
+			print('OF ' + str(numTotal))
+			print('CURRENT PERCENTAGE: ' + str(float(numCorrect)/numTotal))
 
 
 

@@ -9,9 +9,9 @@ class Message(object):
 		self.outputs = np.zeros((self.numPlanes, self.size, self.size))
 
 	def display(self):
-		for plane in xrange(self.numPlanes):
-			print 'PLANE: ' + str(plane+1)
-			print self.outputs[plane]
+		for plane in range(self.numPlanes):
+			print('PLANE: ' + str(plane+1))
+			print(self.outputs[plane])
 
 	def setPlaneOutput(self, plane, toSet):
 		self.outputs[plane] = toSet
@@ -21,22 +21,22 @@ class Message(object):
 
 	def getPointsOnPlanes(self, x, y):
 		output = []
-		for plane in xrange(self.numPlanes):
+		for plane in range(self.numPlanes):
 			output.append(self.outputs[plane][x][y])
 		return output
 
 	def getWindows(self, x, y, windowSize):
 		output = np.zeros((self.numPlanes, (pow(windowSize, 2))))
-		for plane in xrange(self.numPlanes):
+		for plane in range(self.numPlanes):
 			output[plane] = self.getOneWindow(plane, x, y, windowSize)
 		return output
 
 	def getOneWindow(self, plane, x, y, windowSize):
 		output = np.zeros((pow(windowSize, 2)))
 		if windowSize == self.size:
-			count = 0 
-			for i in xrange(windowSize):
-				for j in xrange(windowSize):	
+			count = 0
+			for i in range(windowSize):
+				for j in range(windowSize):
 					try:
 						output[count] = self.outputs[plane][i][j]
 					except Exception:
@@ -48,8 +48,8 @@ class Message(object):
 			endX = x + (windowSize/2)
 			endY = y + (windowSize/2)
 			count = 0
-			for i in xrange(startX, endX):
-				for j in xrange(startY, endY):
+			for i in range(startX, endX):
+				for j in range(startY, endY):
 					try:
 						output[count] = self.outputs[plane][i][j]
 					except Exception:
@@ -59,20 +59,20 @@ class Message(object):
 
 	def getSquareWindows(self, x, y, windowSize):
 		out = np.zeros((self.numPlanes, windowSize, windowSize))
-		for plane in xrange(self.numPlanes):
+		for plane in range(self.numPlanes):
 			out[plane] = self.getOneSquareWindow(plane, x, y, windowSize)
 		return out
 
 	def getOneSquareWindow(self, plane, x, y, windowSize):
 		out = np.zeros((windowSize, windowSize))
 		if windowSize == self.size:
-			for smallx in xrange(self.size):
-				for smally in xrange(self.size):
+			for smallx in range(self.size):
+				for smally in range(self.size):
 					out[smallx][smally] = self.outputs[plane][smallx][smally]
 		else:
 			offset = (windowSize - 1)/2
-			for smallx in xrange(x - offset, x + offset):
-				for smally in xrange(y - offset, y + offset):
+			for smallx in range(x - offset, x + offset):
+				for smally in range(y - offset, y + offset):
 					try: 
 						out[x-smallx+offset][y-smally+offset] = self.outputs[plane][smallx][smally]
 					except Exception:
@@ -82,9 +82,9 @@ class Message(object):
 	def getLocationOfMax(self, sColumn, center, windowSize):
 		maxL = None
 		maxVal = 0
-		for plane in xrange(sColumn.shape[0]):
-			for x in xrange(sColumn.shape[1]):
-				for y in xrange(sColumn.shape[2]):
+		for plane in range(sColumn.shape[0]):
+			for x in range(sColumn.shape[1]):
+				for y in range(sColumn.shape[2]):
 					if sColumn[plane][x][y] > maxVal:
 						maxL = location.Location(plane, x, y)
 		offset = (windowSize - windowSize%2)/2
@@ -116,14 +116,14 @@ class Message(object):
 			temp = self.getLocationOfMax(sColumn, (self.size/2, self.size/2), windowSize)
 			points.append(temp)
 		else:
-			for x in xrange(self.size-offset):
-				for y in xrange(self.size - offset):
+			for x in range(self.size-offset):
+				for y in range(self.size - offset):
 					sColumn = self.getSquareWindows(x, y, windowSize)
 					temp = self.getLocationOfMax(sColumn, (x, y), windowSize)
 					if temp is not None and temp not in points:
 						points.append(temp)
 		reps = []
-		for plane in xrange(self.numPlanes):
+		for plane in range(self.numPlanes):
 			reps.append(self.getMaxPerPlane(plane, points))
 		return reps
 
